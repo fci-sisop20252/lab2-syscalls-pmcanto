@@ -1,9 +1,7 @@
 /*
  * Exercício 3 - Contador de Linhas com Loop
- * 
- * OBJETIVO: Implementar loop de leitura e analisar múltiplas syscalls
- * 
- * TAREFA: Complete os TODOs para implementar o loop
+ * * OBJETIVO: Implementar loop de leitura e analisar múltiplas syscalls
+ * * TAREFA: Complete os TODOs para implementar o loop
  * 1. Compile: gcc src/ex3_contador.c -o ex3_contador
  * 2. Execute: ./ex3_contador
  * 3. Analise: strace -c ./ex3_contador
@@ -15,7 +13,7 @@
 #include <stdio.h>
 #include <time.h>
 
-#define BUFFER_SIZE 64   // Buffer pequeno para forçar múltiplas leituras
+#define BUFFER_SIZE 1024   // Buffer pequeno para forçar múltiplas leituras
 
 int main() {
     char buffer[BUFFER_SIZE];
@@ -40,7 +38,7 @@ int main() {
      * TODO 1: Implementar loop de leitura
      * Loop até read() retornar 0 (fim do arquivo)
      */
-    while (/* TODO: condição do loop */) {
+    while ((bytes_lidos = read(fd, buffer, BUFFER_SIZE)) > 0) {
         total_reads++;
         
         /*
@@ -48,12 +46,16 @@ int main() {
          */
         for (int i = 0; i < bytes_lidos; i++) {
             /* TODO: verificar '\n' e incrementar total_linhas */
+            if (buffer[i] == '\n') {
+                total_linhas++;
+            }
         }
         
         /*
          * TODO 3: Somar total de caracteres
          */
         /* TODO: total_caracteres += ... */;
+        total_caracteres += bytes_lidos;
         
         if (total_reads % 10 == 0) {
             printf("Processadas %d chamadas read()...\n", total_reads);
@@ -63,7 +65,7 @@ int main() {
     /*
      * TODO 4: Verificar se houve erro na leitura
      */
-    if (/* TODO: condição de erro */) {
+    if (bytes_lidos == -1) {
         perror("Erro na leitura");
         close(fd);
         return 1;
@@ -89,8 +91,3 @@ int main() {
     
     return 0;
 }
-
-/*
- * Experimente mudar BUFFER_SIZE para 16, 256, 1024
- * e compare o número de syscalls vs tempo de execução
- */

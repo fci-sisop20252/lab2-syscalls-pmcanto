@@ -58,7 +58,7 @@ Tirando confiar no que está escrito, que é ultima linha, é contar os bytes li
 **3. Por que verificar retorno de cada syscall?**
 
 ```
-Para verificar que não
+Para verificar que não teve alteração ou um resultado diferente do que esperado
 ```
 
 ---
@@ -66,38 +66,38 @@ Para verificar que não
 ## 3️⃣ Exercício 3 - Contador com Loop
 
 ### 📋 Resultados (BUFFER_SIZE = 64):
-- Linhas: _____ (esperado: 25)
-- Caracteres: _____
-- Chamadas read(): _____
-- Tempo: _____ segundos
+- Linhas: 25 (esperado: 25)
+- Caracteres: 1300
+- Chamadas read(): 21
+- Tempo: 0.000147 segundos
 
 ### 🧪 Experimentos com buffer:
 
 | Buffer Size | Chamadas read() | Tempo (s) |
 |-------------|-----------------|-----------|
-| 16          |                 |           |
-| 64          |                 |           |
-| 256         |                 |           |
-| 1024        |                 |           |
+| 16          |     82          |  0.000197 |
+| 64          |    21           |0.000147   |
+| 256         |    6            |0.000066   |
+| 1024        |     2           |0.000068   |
 
 ### 🔍 Análise
 
 **1. Como o tamanho do buffer afeta o número de syscalls?**
 
 ```
-[Sua análise aqui]
+Quanto maior o buffer, menos syscalls são necessárias para a conclusão do programa.
 ```
 
 **2. Todas as chamadas read() retornaram BUFFER_SIZE bytes? Discorra brevemente sobre**
 
 ```
-[Sua análise aqui]
+Todas menos a ultima, por que o read() sempre tentara ler o todo o seu buffer size, mas caso o ultimo não tenha a quantidade de bytes do buffer por ser o final do arquivo, ele retornara o valor total que leu, 
 ```
 
 **3. Qual é a relação entre syscalls e performance?**
 
 ```
-[Sua análise aqui]
+Quanto menos syscalls são realizadas, menos interrupções teram que ser feitas, então menos tempo será gasto para realizar o programa.
 ```
 
 ---
@@ -105,47 +105,47 @@ Para verificar que não
 ## 4️⃣ Exercício 4 - Cópia de Arquivo
 
 ### 📈 Resultados:
-- Bytes copiados: _____
-- Operações: _____
-- Tempo: _____ segundos
-- Throughput: _____ KB/s
+- Bytes copiados: 1364
+- Operações: 6
+- Tempo: 0.000200 segundos
+- Throughput:6660.16 KB/s
 
 ### ✅ Verificação:
 ```bash
 diff dados/origem.txt dados/destino.txt
 ```
-Resultado: [ ] Idênticos [ ] Diferentes
+Resultado: [X] Idênticos [ ] Diferentes
 
 ### 🔍 Análise
 
 **1. Por que devemos verificar que bytes_escritos == bytes_lidos?**
 
 ```
-[Sua análise aqui]
+Por que pode ter realizado alguma variação ou erro no código ou na escrita/leitura
 ```
 
 **2. Que flags são essenciais no open() do destino?**
 
 ```
-[Sua análise aqui]
+O_WRONLY: Abre o arquivo para escrita, O_CREAT: Garante que o arquivo seja criado se ele ainda não existir, O_TRUNC:** Se o arquivo já existir, esta flag o trunca para um tamanho de zero bytes, garantindo que o novo conteúdo não seja anexado ao antigo.
 ```
 
 **3. O número de reads e writes é igual? Por quê?**
 
 ```
-[Sua análise aqui]
+Sim, ocorre a mesma quantidade de write() e read() porque a chamada `write()` está diretamente dentro do loop `while`, e o loop é executado uma vez para cada chamada `read()` que retorna um número de bytes maior que zero.
 ```
 
 **4. Como você saberia se o disco ficou cheio?**
 
 ```
-[Sua análise aqui]
+O programa saberia que o disco ficou cheio através do valor de retorno da syscall `write()`. Se o disco estiver cheio, a chamada `write()` falhará e retornará `-1`.
 ```
 
 **5. O que acontece se esquecer de fechar os arquivos?**
 
 ```
-[Sua análise aqui]
+Se o programa esquecer de fechar os arquivos, ocorrerá um file descriptor leak
 ```
 
 ---
@@ -157,19 +157,19 @@ Resultado: [ ] Idênticos [ ] Diferentes
 **1. Como as syscalls demonstram a transição usuário → kernel?**
 
 ```
-[Sua análise aqui]
+As syscalls são a forma que ocorre a transição do modo usuário para o modo kernel. Quando um programa no modo usuário precisa de um serviço privilegiado do sistema operacional, ele não pode executá-lo diretamente. Em vez disso, ele faz uma chamada de sistema.
 ```
 
 **2. Qual é o seu entendimento sobre a importância dos file descriptors?**
 
 ```
-[Sua análise aqui]
+File descriptors (FDs) são inteiros não-negativos que o kernel do sistema operacional usa para representar uma abstração de um recurso de E/S
 ```
 
 **3. Discorra sobre a relação entre o tamanho do buffer e performance:**
 
 ```
-[Sua análise aqui]
+O tamanho do buffer é crucial para a performance de operações de E/S, pois ele determina a frequência com que as syscalls são realizadas. quanto maior o buffer, melhor a performance
 ```
 
 ### ⚡ Comparação de Performance
@@ -180,21 +180,21 @@ time ./ex4_copia
 time cp dados/origem.txt dados/destino_cp.txt
 ```
 
-**Qual foi mais rápido?** _____
+**Qual foi mais rápido?** user
 
 **Por que você acha que foi mais rápido?**
 
 ```
-[Sua análise aqui]
+Por que o user tinha menos ações para realizar
 ```
 
 ---
 
 ## 📤 Entrega
 Certifique-se de ter:
-- [ ] Todos os códigos com TODOs completados
-- [ ] Traces salvos em `traces/`
-- [ ] Este relatório preenchido como `RELATORIO.md`
+- [x] Todos os códigos com TODOs completados
+- [x] Traces salvos em `traces/`
+- [x] Este relatório preenchido como `RELATORIO.md`
 
 ```bash
 strace -e write -o traces/ex1a_trace.txt ./ex1a_printf
